@@ -1,88 +1,49 @@
-import React, { useState } from "react"
-import axios from "axios"
+import React, { useState } from "react";
 
 function ProfileForm() {
+  const [followers, setFollowers] = useState("");
+  const [following, setFollowing] = useState("");
+  const [posts, setPosts] = useState("");
+  const [bioLength, setBioLength] = useState("");
+  const [profilePic, setProfilePic] = useState("");
+  const [result, setResult] = useState("");
 
-const [followers, setFollowers] = useState("")
-const [following, setFollowing] = useState("")
-const [posts, setPosts] = useState("")
-const [bio, setBio] = useState("")
-const [pic, setPic] = useState("")
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-const [result, setResult] = useState("")
+    const response = await fetch("https://fake-profile-backend.onrender.com/detect", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        followers,
+        following,
+        posts,
+        bio_length: bioLength,
+        profile_pic: profilePic
+      })
+    });
 
-const handleSubmit = async (e) => {
-e.preventDefault()
+    const data = await response.json();
+    setResult(data.result);
+  };
 
-const response = await axios.post(
-"http://localhost:5000/detect",
-{
-followers: followers,
-following: following,
-posts: posts,
-bio_length: bio,
-profile_pic: pic
-}
-)
+  return (
+    <div>
+      <form onSubmit={handleSubmit}>
+        <input placeholder="Followers" onChange={(e) => setFollowers(e.target.value)} />
+        <input placeholder="Following" onChange={(e) => setFollowing(e.target.value)} />
+        <input placeholder="Posts" onChange={(e) => setPosts(e.target.value)} />
+        <input placeholder="Bio Length" onChange={(e) => setBioLength(e.target.value)} />
+        <input placeholder="Profile Pic (0 or 1)" onChange={(e) => setProfilePic(e.target.value)} />
+        
+        <button type="submit">Detect</button>
+      </form>
 
-setResult(response.data.result)
-}
-
-return (
-
-<div>
-
-<h2>AI Fake Profile Detection</h2>
-
-<form onSubmit={handleSubmit}>
-
-<input
-placeholder="Followers"
-onChange={(e)=>setFollowers(e.target.value)}
-/>
-
-<br/><br/>
-
-<input
-placeholder="Following"
-onChange={(e)=>setFollowing(e.target.value)}
-/>
-
-<br/><br/>
-
-<input
-placeholder="Posts"
-onChange={(e)=>setPosts(e.target.value)}
-/>
-
-<br/><br/>
-
-<input
-placeholder="Bio Length"
-onChange={(e)=>setBio(e.target.value)}
-/>
-
-<br/><br/>
-
-<input
-placeholder="Profile Picture (1 or 0)"
-onChange={(e)=>setPic(e.target.value)}
-/>
-
-<br/><br/>
-
-<button type="submit">
-Detect Profile
-</button>
-
-</form>
-
-<h3>{result}</h3>
-
-</div>
-
-)
-
+      <h3>{result}</h3>
+    </div>
+  );
 }
 
-export default ProfileForm
+export default ProfileForm;
