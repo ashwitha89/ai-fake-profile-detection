@@ -9,25 +9,32 @@ function ProfileForm() {
   const [result, setResult] = useState("");
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
+  try {
     const response = await fetch("https://ai-fake-profile-detection-glsl.onrender.com/detect", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        followers,
-        following,
-        posts,
-        bio_length: bioLength,
-        profile_pic: profilePic
+        followers: Number(followers),
+        following: Number(following),
+        posts: Number(posts),
+        bio_length: Number(bioLength),
+        profile_pic: Number(profilePic)
       })
     });
 
     const data = await response.json();
+    console.log(data);   // 🔥 see output in console
     setResult(data.result);
-  };
+
+  } catch (error) {
+    console.error("Error:", error);
+    setResult("Error connecting to backend");
+  }
+};
 
   return (
     <div>
