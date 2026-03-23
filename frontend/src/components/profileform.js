@@ -11,7 +11,7 @@ function ProfileForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await fetch("https://fake-profile-backend.onrender.com/detect", {
+    const response = await fetch("https://ai-fake-profile-detection-glsl.onrender.com/detect", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
