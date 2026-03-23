@@ -1,5 +1,5 @@
 import React from "react"
-import ProfileForm from "./components/profileform"
+import ProfileForm from "./components/profileform.js"
 
 function App() {
 
