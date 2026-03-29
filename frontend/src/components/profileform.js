@@ -1,56 +1,73 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
-function ProfileForm() {
-  const [followers, setFollowers] = useState("");
-  const [following, setFollowing] = useState("");
-  const [posts, setPosts] = useState("");
-  const [bioLength, setBioLength] = useState("");
-  const [profilePic, setProfilePic] = useState("");
-  const [result, setResult] = useState("");
+const ProfileForm = () => {
+  const [formData, setFormData] = useState({
+    followers: "",
+    following: "",
+    posts: "",
+    bio_length: "",
+    profile_pic: ""
+  });
+
+  const [result, setResult] = useState(null);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
-    const response = await fetch("https://ai-fake-profile-detection-glsl.onrender.com/detect", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        followers: Number(followers),
-        following: Number(following),
-        posts: Number(posts),
-        bio_length: Number(bioLength),
-        profile_pic: Number(profilePic)
-      })
-    });
+    try {
+      const response = await fetch("http://127.0.0.1:5000/predict", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          followers: Number(formData.followers),
+          following: Number(formData.following),
+          posts: Number(formData.posts),
+          bio_length: Number(formData.bio_length),
+          profile_pic: Number(formData.profile_pic)
+        })
+      });
 
-    const data = await response.json();
-    console.log(data);   // 🔥 see output in console
-    setResult(data.result);
+      const data = await response.json();
+      setResult(data);
 
-  } catch (error) {
-    console.error("Error:", error);
-    setResult("Error connecting to backend");
-  }
-};
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   return (
     <div>
+      <h2>AI Fake Profile Detection</h2>
+
       <form onSubmit={handleSubmit}>
-        <input placeholder="Followers" onChange={(e) => setFollowers(e.target.value)} />
-        <input placeholder="Following" onChange={(e) => setFollowing(e.target.value)} />
-        <input placeholder="Posts" onChange={(e) => setPosts(e.target.value)} />
-        <input placeholder="Bio Length" onChange={(e) => setBioLength(e.target.value)} />
-        <input placeholder="Profile Pic (0 or 1)" onChange={(e) => setProfilePic(e.target.value)} />
-        
+        <input type="number" name="followers" placeholder="Followers" onChange={handleChange} />
+        <input type="number" name="following" placeholder="Following" onChange={handleChange} />
+        <input type="number" name="posts" placeholder="Posts" onChange={handleChange} />
+        <input type="number" name="bio_length" placeholder="Bio Length" onChange={handleChange} />
+        <input type="number" name="profile_pic" placeholder="Profile Pic (0 or 1)" onChange={handleChange} />
+
         <button type="submit">Detect</button>
       </form>
 
-      <h3>{result}</h3>
+      {/* ✅ Show Result */}
+      {result && (
+        <div style={{ marginTop: "20px" }}>
+          <h3>Result: {result.result}</h3>
+          <p>Confidence: {result.confidence}</p>
+        </div>
+      )}
     </div>
   );
-}
+};
 
 export default ProfileForm;
