@@ -1,11 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AI Fake Profile Detector</title>
+<meta charset="UTF-8">
+<title>AI-Assisted Fake Profile Detection</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+    color: white;
+    text-align: center;
+}
+
+.container {
+    background: white;
+    color: black;
+    width: 380px;
+    margin: 40px auto;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+input {
+    width: 90%;
+    padding: 10px;
+    margin: 8px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+button {
+    width: 95%;
+    padding: 12px;
+    background: linear-gradient(to right, #ff512f, #dd2476);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    transform: scale(1.05);
+}
+
+#result {
+    margin-top: 15px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#suggestion {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #333;
+}
+
+.ai-box {
+    background: #f1f1f1;
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 13px;
+}
+</style>
 </head>
+
 <body>
-  <div id="root"></div>
+
+<h1>🤖 AI-Assisted Fake Profile Detection</h1>
+
+<div class="container">
+
+<h3>Enter Profile Details</h3>
+
+<input id="followers" type="number" placeholder="Followers" required>
+<input id="following" type="number" placeholder="Following" required>
+<input id="posts" type="number" placeholder="Posts" required>
+<input id="bio" type="number" placeholder="Bio Length" required>
+<input id="pic" type="number" placeholder="Profile Pic (0 or 1)" required>
+
+<button onclick="detectProfile()">🚀 Detect Profile</button>
+
+<div id="result"></div>
+<div id="suggestion"></div>
+
+<div class="ai-box">
+<b>💡 How AI helped:</b><br>
+• Generated frontend UI<br>
+• Built backend prediction API<br>
+• Assisted in debugging & logic improvement<br>
+</div>
+
+</div>
+
+<script>
+function detectProfile() {
+
+    let followers = document.getElementById("followers").value;
+    let following = document.getElementById("following").value;
+    let posts = document.getElementById("posts").value;
+    let bio = document.getElementById("bio").value;
+    let pic = document.getElementById("pic").value;
+
+    // ✅ Validation (NEW)
+    if (!followers || !following || !posts || !bio || pic === "") {
+        alert("Please fill all fields!");
+        return;
+    }
+
+    document.getElementById("result").innerText = "⏳ Analyzing...";
+    document.getElementById("suggestion").innerText = "";
+
+    fetch("http://127.0.0.1:5000/predict", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            followers: Number(followers),
+            following: Number(following),
+            posts: Number(posts),
+            bio_length: Number(bio),
+            profile_pic: Number(pic)
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        // ✅ Handle backend error
+        if (data.error) {
+            document.getElementById("result").innerText = "❌ " + data.error;
+            return;
+        }
+
+        document.getElementById("result").innerText =
+            `${data.result} (${data.confidence} confidence)`;
+
+        if (data.result.includes("Real")) {
+            document.getElementById("result").style.color = "green";
+        } else {
+            document.getElementById("result").style.color = "red";
+        }
+
+        if (data.reasons && data.reasons.length > 0) {
+            document.getElementById("suggestion").innerText =
+                "💡 Reasons: " + data.reasons.join(", ");
+        } else {
+            document.getElementById("suggestion").innerText =
+                "✅ Looks like a normal profile";
+        }
+    })
+    .catch(err => {
+        document.getElementById("result").innerText =
+            "❌ Backend not running or connection error";
+    });
+}
+</script>
+
 </body>
 </html>

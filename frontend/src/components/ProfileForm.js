@@ -12,10 +12,9 @@ const ProfileForm = () => {
   const [result, setResult] = useState(null);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [e.target.name]: e.target.value
     });
   };
 
@@ -23,7 +22,7 @@ const ProfileForm = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("https://ai-fake-profile-detection-3.onrender.com/predict", {
+      const response = await fetch("http://127.0.0.1:5000/predict", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -42,32 +41,84 @@ const ProfileForm = () => {
 
     } catch (error) {
       console.error("Error:", error);
+      alert("Backend not running!");
     }
   };
 
   return (
-    <div>
-      <h2>AI Fake Profile Detection</h2>
+    <div style={styles.container}>
+      <h1 style={styles.title}>AI Fake Profile Detection</h1>
 
-      <form onSubmit={handleSubmit}>
-        <input type="number" name="followers" placeholder="Followers" onChange={handleChange} />
-        <input type="number" name="following" placeholder="Following" onChange={handleChange} />
-        <input type="number" name="posts" placeholder="Posts" onChange={handleChange} />
-        <input type="number" name="bio_length" placeholder="Bio Length" onChange={handleChange} />
-        <input type="number" name="profile_pic" placeholder="Profile Pic (0 or 1)" onChange={handleChange} />
+      <form onSubmit={handleSubmit} style={styles.form}>
+        <input type="number" name="followers" placeholder="Followers" onChange={handleChange} style={styles.input} />
+        <input type="number" name="following" placeholder="Following" onChange={handleChange} style={styles.input} />
+        <input type="number" name="posts" placeholder="Posts" onChange={handleChange} style={styles.input} />
+        <input type="number" name="bio_length" placeholder="Bio Length" onChange={handleChange} style={styles.input} />
+        <input type="number" name="profile_pic" placeholder="Profile Pic (0 or 1)" onChange={handleChange} style={styles.input} />
 
-        <button type="submit">Detect</button>
+        <button type="submit" style={styles.button}>Detect</button>
       </form>
 
-      {/* ✅ Show Result */}
       {result && (
-        <div style={{ marginTop: "20px" }}>
-          <h3>Result: {result.result}</h3>
+        <div style={styles.resultBox}>
+          <h2>{result.result}</h2>
           <p>Confidence: {result.confidence}</p>
+
+          <ul>
+            {result.reasons.map((r, i) => (
+              <li key={i}>{r}</li>
+            ))}
+          </ul>
         </div>
       )}
     </div>
   );
+};
+
+const styles = {
+  container: {
+    textAlign: "center",
+    marginTop: "50px",
+    fontFamily: "Arial",
+    background: "linear-gradient(to right, #74ebd5, #ACB6E5)",
+    height: "100vh",
+    paddingTop: "30px"
+  },
+  title: {
+    color: "#333"
+  },
+  form: {
+    background: "white",
+    padding: "20px",
+    borderRadius: "10px",
+    width: "300px",
+    margin: "auto",
+    boxShadow: "0px 0px 10px gray"
+  },
+  input: {
+    width: "90%",
+    padding: "10px",
+    margin: "10px",
+    borderRadius: "5px",
+    border: "1px solid #ccc"
+  },
+  button: {
+    padding: "10px 20px",
+    background: "#4CAF50",
+    color: "white",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer"
+  },
+  resultBox: {
+    marginTop: "20px",
+    background: "white",
+    padding: "20px",
+    borderRadius: "10px",
+    width: "300px",
+    marginLeft: "auto",
+    marginRight: "auto"
+  }
 };
 
 export default ProfileForm;
